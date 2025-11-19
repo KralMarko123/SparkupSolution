@@ -19,7 +19,7 @@ namespace SparkUpSolution.Controllers
         [Route("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest request)
         {
-            if (request.Username != "admin" || request.Password != "password")
+            if (request.Username != "sparkup" || request.Password != "sparkup")
             {
                 return await Task.FromResult(Unauthorized());
             }
