@@ -1,0 +1,6 @@
+@SparkUpSolution_HostAddress = http://localhost:5288
+
+GET {{SparkUpSolution_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
