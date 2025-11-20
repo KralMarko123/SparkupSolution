@@ -17,6 +17,12 @@ namespace SparkUpSolution.Controllers
             this.jwtHelper = jwtHelper;
         }
 
+        /// <summary>
+        /// Returns a Jwt token for simple authentication
+        /// </summary>
+        /// <remarks>
+        /// Use 'sparkup' for both username and password to obtain token
+        /// </remarks>
         [HttpPost]
         [Route("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest request)

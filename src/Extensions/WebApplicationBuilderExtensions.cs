@@ -5,6 +5,7 @@ using SparkUpSolution.Application.Services;
 using SparkUpSolution.Infrastructure.Logging;
 using SparkUpSolution.Infrastructure.Repositories;
 using SparkUpSolution.Middlewares;
+using Swashbuckle.AspNetCore.Swagger;
 using System.Text;
 
 namespace SparkUpSolution.Extensions
@@ -86,6 +87,10 @@ namespace SparkUpSolution.Extensions
                         }, Array.Empty<string>()
                     }
                 });
+
+                // Add xml descriptions
+                options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "SparkUpSolution.xml"));
             });
         }
     }
