@@ -19,15 +19,15 @@ namespace SparkUpSolution.Infrastructure.Persistence
             // properties
             modelBuilder.Entity<Player>()
                 .Property(p => p.Id)
-                .HasDefaultValue("gen_random_uuid()");
+                .HasDefaultValueSql("gen_random_uuid()");
 
             modelBuilder.Entity<Bonus>()
                 .Property(b => b.Id)
-                .HasDefaultValue("gen_random_uuid()");
+                .HasDefaultValueSql("gen_random_uuid()");
 
             modelBuilder.Entity<BonusAuditLog>()
                 .Property(b => b.Id)
-                .HasDefaultValue("gen_random_uuid()");
+                .HasDefaultValueSql("gen_random_uuid()");
 
             // indices
             modelBuilder.Entity<Bonus>()

@@ -11,11 +11,14 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Ensure the pgcrypto extension is created for UUID generation
+            migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";");
+
             migrationBuilder.CreateTable(
                 name: "BonusAuditLogs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BonusId = table.Column<Guid>(type: "uuid", nullable: false),
                     Action = table.Column<string>(type: "text", nullable: false),
                     PerformedById = table.Column<string>(type: "text", nullable: false),
@@ -31,7 +34,7 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
                 name: "Players",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     Username = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -43,7 +46,7 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
                 name: "Bonuses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     PlayerId = table.Column<Guid>(type: "uuid", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
