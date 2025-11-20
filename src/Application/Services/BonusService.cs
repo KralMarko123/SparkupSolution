@@ -88,7 +88,7 @@ namespace SparkUpSolution.Application.Services
 
                 if (hasActive)
                 {
-                    throw new InvalidOperationException($"Player with Id: '{bonus.PlayerId}' already has an active bonus of type '{bonus.Type}'.");
+                    throw new InvalidOperationException($"Player with Id '{bonus.PlayerId}' already has an active bonus of type '{bonus.Type}'.");
                 }
             }
 
