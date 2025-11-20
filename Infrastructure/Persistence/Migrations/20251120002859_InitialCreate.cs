@@ -12,6 +12,22 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "BonusAuditLogs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    BonusId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Action = table.Column<string>(type: "text", nullable: false),
+                    PerformedById = table.Column<string>(type: "text", nullable: false),
+                    PerformedByName = table.Column<string>(type: "text", nullable: false),
+                    PerformedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BonusAuditLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Players",
                 columns: table => new
                 {
@@ -53,6 +69,9 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "BonusAuditLogs");
+
             migrationBuilder.DropTable(
                 name: "Bonuses");
 

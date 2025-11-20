@@ -5,6 +5,6 @@
         Pending = 0,
         Active = 1,
         Redeemed = 2,
-        Cancelled = 3
+        Deactivated = 3
     }
 }

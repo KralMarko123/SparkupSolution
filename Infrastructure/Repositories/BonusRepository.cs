@@ -19,7 +19,7 @@ namespace SparkUpSolution.Infrastructure.Repositories
         {
             var query = appDbContext.Bonuses;
 
-            var total = await query.CountAsync();
+            var total = await query.CountAsync(cancellationToken);
             var items = await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -27,35 +27,44 @@ namespace SparkUpSolution.Infrastructure.Repositories
 
             return new PagedResult<Bonus>(items, pageNumber, pageSize, total);
         }
-
-        Task IBonusRepository.AddAsync(Bonus bonus, CancellationToken cancellationToken)
+        
+        public async Task<Bonus?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await appDbContext.Bonuses.FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
         }
 
-        Task IBonusRepository.DeleteAsync(Bonus bonus, CancellationToken cancellationToken)
+        public async Task<bool> HasActiveBonusOfTypeAsync(Guid playerId, BonusType type, Guid? exceptId = null, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var query = appDbContext.Bonuses.Where(b => b.PlayerId == playerId && b.Type == type && b.Status == BonusStatus.Active);
+
+            if (exceptId.HasValue)
+            {
+                query = query.Where(b => b.Id != exceptId.Value);
+            }
+
+            return await query.AnyAsync(cancellationToken);
         }
 
-        Task<Bonus?> IBonusRepository.GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task AddAsync(Bonus bonus, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await appDbContext.Bonuses.AddAsync(bonus, cancellationToken);
         }
 
-        Task<bool> IBonusRepository.HasActiveBonusOfTypeAsync(Guid playerId, BonusType type, CancellationToken cancellationToken)
+        public async Task DeleteAsync(Bonus bonus, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            appDbContext.Bonuses.Remove(bonus);
+            await Task.CompletedTask;
         }
 
-        Task<int> IBonusRepository.SaveChangesAsync(CancellationToken cancellationToken)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await appDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        Task IBonusRepository.UpdateAsync(Bonus bonus, CancellationToken cancellationToken)
+        public async Task UpdateAsync(Bonus bonus, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            appDbContext.Bonuses.Update(bonus);
+            await Task.CompletedTask;
         }
     }
 }

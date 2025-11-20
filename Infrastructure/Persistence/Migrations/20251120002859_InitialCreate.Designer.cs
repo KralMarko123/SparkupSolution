@@ -12,7 +12,7 @@ using SparkUpSolution.Infrastructure.Persistence;
 namespace SparkUpSolution.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251119161108_InitialCreate")]
+    [Migration("20251120002859_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SparkUpSolution.Domain.Models.Bonus", b =>
+            modelBuilder.Entity("SparkUpSolution.Domain.Entities.Bonus", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +50,7 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
                     b.ToTable("Bonuses");
                 });
 
-            modelBuilder.Entity("SparkUpSolution.Domain.Models.Player", b =>
+            modelBuilder.Entity("SparkUpSolution.Domain.Entities.Player", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,9 +65,38 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("SparkUpSolution.Domain.Models.Bonus", b =>
+            modelBuilder.Entity("SparkUpSolution.Infrastructure.Logging.BonusAuditLog", b =>
                 {
-                    b.HasOne("SparkUpSolution.Domain.Models.Player", "Player")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("BonusId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("PerformedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PerformedById")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PerformedByName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BonusAuditLogs");
+                });
+
+            modelBuilder.Entity("SparkUpSolution.Domain.Entities.Bonus", b =>
+                {
+                    b.HasOne("SparkUpSolution.Domain.Entities.Player", "Player")
                         .WithMany("Bonuses")
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -76,7 +105,7 @@ namespace SparkUpSolution.Infrastructure.Persistence.Migrations
                     b.Navigation("Player");
                 });
 
-            modelBuilder.Entity("SparkUpSolution.Domain.Models.Player", b =>
+            modelBuilder.Entity("SparkUpSolution.Domain.Entities.Player", b =>
                 {
                     b.Navigation("Bonuses");
                 });

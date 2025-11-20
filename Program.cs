@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SparkUpSolution.Application.Mapping;
 using SparkUpSolution.Extensions;
 using SparkUpSolution.Infrastructure.Persistence;
+using SparkUpSolution.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -18,7 +19,8 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<BonusProfile>();
 });
-builder.WithServices();
+builder.Services.AddHttpContextAccessor();
+builder.WithAppServices();
 builder.WithAuthentication();
 builder.Services.AddAuthorization();
 builder.WithSwaggerEnabled();
@@ -32,14 +34,19 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.WithDatabaseReset();
+
+    await app.WithDatabaseReset();
 }
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+
 
 app.MapControllers();
 

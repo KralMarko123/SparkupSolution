@@ -8,6 +8,8 @@ namespace SparkUpSolution.Controllers
     [AllowAnonymous]
     public class AuthController : ControllerBase
     {
+        private const string SPARKUP_USERNAME = "sparkup";
+        private const string SPARKUP_PASSWORD = "sparkup";
         private readonly IJwtHelper jwtHelper;
 
         public AuthController(IJwtHelper jwtHelper)
@@ -19,7 +21,7 @@ namespace SparkUpSolution.Controllers
         [Route("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest request)
         {
-            if (request.Username != "sparkup" || request.Password != "sparkup")
+            if (request.Username != SPARKUP_USERNAME || request.Password != SPARKUP_PASSWORD)
             {
                 return await Task.FromResult(Unauthorized());
             }
