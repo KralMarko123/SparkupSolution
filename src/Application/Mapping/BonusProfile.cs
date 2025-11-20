@@ -13,6 +13,7 @@ namespace SparkUpSolution.Application.Mapping
             CreateMap<Bonus, BonusDTO>();
             CreateMap<CreateBonusRequest, Bonus>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Player, opt => opt.Ignore())
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => BonusStatus.Pending));
         }
     }
