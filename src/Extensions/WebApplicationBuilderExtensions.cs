@@ -2,7 +2,6 @@
 using Microsoft.OpenApi.Models;
 using SparkUpSolution.Application.Helpers;
 using SparkUpSolution.Application.Services;
-using SparkUpSolution.Infrastructure.Logging;
 using SparkUpSolution.Infrastructure.Repositories;
 using SparkUpSolution.Middlewares;
 using Swashbuckle.AspNetCore.Swagger;

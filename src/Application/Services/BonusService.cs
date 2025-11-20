@@ -5,7 +5,6 @@ using SparkUpSolution.Domain.Entities;
 using SparkUpSolution.Domain.Enums;
 using SparkUpSolution.Infrastructure.Logging;
 using SparkUpSolution.Infrastructure.Repositories;
-using SparkUpSolution.Middlewares;
 
 namespace SparkUpSolution.Application.Services
 {

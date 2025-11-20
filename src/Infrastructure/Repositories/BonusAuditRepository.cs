@@ -1,6 +1,7 @@
-﻿using SparkUpSolution.Infrastructure.Persistence;
+﻿using SparkUpSolution.Infrastructure.Logging;
+using SparkUpSolution.Infrastructure.Persistence;
 
-namespace SparkUpSolution.Infrastructure.Logging
+namespace SparkUpSolution.Infrastructure.Repositories
 {
     public class BonusAuditRepository : IBonusAuditRepository
     {

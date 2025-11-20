@@ -1,4 +1,6 @@
-﻿namespace SparkUpSolution.Infrastructure.Logging
+﻿using SparkUpSolution.Infrastructure.Logging;
+
+namespace SparkUpSolution.Infrastructure.Repositories
 {
     public interface IBonusAuditRepository
     {

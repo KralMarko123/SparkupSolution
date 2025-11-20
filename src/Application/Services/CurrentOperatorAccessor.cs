@@ -1,4 +1,4 @@
-﻿namespace SparkUpSolution.Middlewares
+﻿namespace SparkUpSolution.Application.Services
 {
     public class CurrentOperatorAccessor : ICurrentOperatorAccessor
     {
