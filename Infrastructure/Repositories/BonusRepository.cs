@@ -45,9 +45,11 @@ namespace SparkUpSolution.Infrastructure.Repositories
             return await query.AnyAsync(cancellationToken);
         }
 
-        public async Task AddAsync(Bonus bonus, CancellationToken cancellationToken)
+        public async Task<Bonus> AddAsync(Bonus bonus, CancellationToken cancellationToken)
         {
-            await appDbContext.Bonuses.AddAsync(bonus, cancellationToken);
+            var result = await appDbContext.Bonuses.AddAsync(bonus, cancellationToken);
+
+            return result.Entity;
         }
 
         public async Task DeleteAsync(Bonus bonus, CancellationToken cancellationToken)

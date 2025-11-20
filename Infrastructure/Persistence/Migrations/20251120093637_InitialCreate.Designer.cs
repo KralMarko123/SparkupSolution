@@ -12,7 +12,7 @@ using SparkUpSolution.Infrastructure.Persistence;
 namespace SparkUpSolution.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251120002859_InitialCreate")]
+    [Migration("20251120093637_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

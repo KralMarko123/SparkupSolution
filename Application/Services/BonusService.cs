@@ -28,7 +28,7 @@ namespace SparkUpSolution.Application.Services
             this.currentOperator = currentOperator;
         }
 
-        public async Task<PagedResult<BonusDTO>> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<BonusDTO>> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             var pagedBonuses = await bonusRepository.GetAllAsync(pageNumber, pageSize, cancellationToken);
             var dtoItems = mapper.Map<IReadOnlyCollection<BonusDTO>>(pagedBonuses.Items);
@@ -36,7 +36,7 @@ namespace SparkUpSolution.Application.Services
             return new PagedResult<BonusDTO>(dtoItems, pagedBonuses.PageNumber, pagedBonuses.PageSize, pagedBonuses.TotalCount);
         }
 
-        public async Task<BonusDTO> CreateAsync(CreateBonusRequest request, CancellationToken cancellationToken)
+        public async Task<BonusDTO> CreateAsync(CreateBonusRequest request, CancellationToken cancellationToken = default)
         {
             var player = await playerRepository.GetByIdAsync(request.PlayerId, cancellationToken) ?? throw new KeyNotFoundException($"Player with Id '{request.PlayerId}' was not found.");
 
@@ -50,15 +50,18 @@ namespace SparkUpSolution.Application.Services
 
             var bonus = mapper.Map<Bonus>(request);
 
-            await bonusRepository.AddAsync(bonus, cancellationToken);
+            var createdBonus = await bonusRepository.AddAsync(bonus, cancellationToken);
             await bonusRepository.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Bonus of type '{BonusType}' created for player with Id '{PlayerId}'", bonus.Type, bonus.PlayerId);
+            var bonusAudit = await GenerateBonusAudit(createdBonus.Id, "Create", cancellationToken);
+
+            logger.LogInformation("Bonus of type '{BonusType}' created for player with Id '{PlayerId}' by operator with Id '{OperatorId}' and Name '{OperatorName}' at {AuditTimestamp}",
+                bonus.Type, bonus.PlayerId, currentOperator.Id, currentOperator.Name, bonusAudit.PerformedAt.ToString("G"));
 
             return mapper.Map<BonusDTO>(bonus);
         }
 
-        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var bonus = await bonusRepository.GetByIdAsync(id, cancellationToken) ?? throw new KeyNotFoundException($"Bonus with Id '{id}' was not found.");
 
@@ -68,23 +71,13 @@ namespace SparkUpSolution.Application.Services
             await bonusRepository.UpdateAsync(bonus, cancellationToken);
             await bonusRepository.SaveChangesAsync(cancellationToken);
 
-            // Log the soft deletion
-            var log = new BonusAuditLog
-            {
-                BonusId = bonus.Id,
-                Action = "Delete",
-                PerformedAt = DateTime.UtcNow,
-                PerformedById = currentOperator.Id,
-                PerformedByName = currentOperator.Name,
-            };
+            // Generate audit and log action
+            var bonusAudit = await GenerateBonusAudit(bonus.Id, "Delete", cancellationToken);
 
-            await auditRepository.AddAsync(log, cancellationToken);
-            await auditRepository.SaveChangesAsync(cancellationToken);
-
-            logger.LogInformation("Bonus with Id '{BonusId}' deactivated by operator with Id '{OperatorId}' and Name '{OperatorName}' at {AuditTimestamp}", bonus.Id, currentOperator.Id, currentOperator.Name, log.PerformedAt.ToString("G"));
+            logger.LogInformation("Bonus with Id '{BonusId}' deactivated by operator with Id '{OperatorId}' and Name '{OperatorName}' at {AuditTimestamp}", bonus.Id, currentOperator.Id, currentOperator.Name, bonusAudit.PerformedAt.ToString("G"));
         }
 
-        public async Task<BonusDTO> UpdateAsync(Guid id, UpdateBonusRequest request, CancellationToken cancellationToken)
+        public async Task<BonusDTO> UpdateAsync(Guid id, UpdateBonusRequest request, CancellationToken cancellationToken = default)   
         {
             var bonus = await bonusRepository.GetByIdAsync(id, cancellationToken) ?? throw new KeyNotFoundException($"Bonus with Id '{id}' was not found.");
 
@@ -110,22 +103,31 @@ namespace SparkUpSolution.Application.Services
             await bonusRepository.UpdateAsync(bonus, cancellationToken);
             await bonusRepository.SaveChangesAsync(cancellationToken);
 
-            // Log the update
-            var log = new BonusAuditLog
+            // Generate audit and log action
+            var bonusAudit = await GenerateBonusAudit(bonus.Id, "Update", cancellationToken);
+
+            logger.LogInformation("Bonus with Id '{BonusId}' updated by operator with Id '{OperatorId}' and Name '{OperatorName}' at {AuditTimestamp}", bonus.Id, currentOperator.Id, currentOperator.Name, bonusAudit.PerformedAt.ToString("G"));
+
+            return mapper.Map<BonusDTO>(bonus);
+        }
+
+        private async Task<BonusAuditLog> GenerateBonusAudit(Guid bonusId, string actionPerformed, CancellationToken cancellationToken = default)
+        {
+            // create audit
+            var auditLog = new BonusAuditLog
             {
-                BonusId = bonus.Id,
-                Action = "Update",
+                BonusId = bonusId,
+                Action = actionPerformed,
                 PerformedAt = DateTime.UtcNow,
                 PerformedById = currentOperator.Id,
                 PerformedByName = currentOperator.Name
             };
 
-            await auditRepository.AddAsync(log, cancellationToken);
+            // store and save audit
+            await auditRepository.AddAsync(auditLog, cancellationToken);
             await auditRepository.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Bonus with Id '{BonusId}' updated by operator with Id '{OperatorId}' and Name '{OperatorName}' at {AuditTimestamp}", bonus.Id, currentOperator.Id, currentOperator.Name, log.PerformedAt.ToString("G"));
-
-            return mapper.Map<BonusDTO>(bonus);
+            return auditLog;
         }
     }
 }
